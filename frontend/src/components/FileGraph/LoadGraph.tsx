@@ -1,5 +1,6 @@
-import { useLoadGraph } from '@react-sigma/core'
+import { useLoadGraph, useSigma } from '@react-sigma/core'
 import Graph from 'graphology'
+import { circular } from 'graphology-layout'
 import React, { useEffect } from 'react'
 
 interface FileSystemProps {
@@ -19,18 +20,17 @@ interface FileSystemProps {
 
 const LoadGraph: React.FC<FileSystemProps> = ({ fileSystem }) => {
   const loadGraph = useLoadGraph()
+  const sigma = useSigma()
 
   useEffect(() => {
-    if (!fileSystem) return
+    if (!fileSystem || !sigma) return
 
     const graph = new Graph()
 
     fileSystem.files.forEach(file => {
       graph.addNode(file.id, {
         label: file.name,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: 10,
+        size: file.type === 'file' ? 5 : 10,
         color: file.type === 'file' ? '#6366f1' : '#10b981'
       })
     })
@@ -41,10 +41,28 @@ const LoadGraph: React.FC<FileSystemProps> = ({ fileSystem }) => {
       }
     })
 
+    // Apply a circular layout
+    circular.assign(graph)
+
+    // Load the graph
     loadGraph(graph)
 
+    // Update node positions
+    graph.forEachNode((node, attributes) => {
+      const { x, y } = attributes
+      sigma.getNodeDisplayData(node).x = x
+      sigma.getNodeDisplayData(node).y = y
+    })
+
+    // Refresh the rendering
+    sigma.refresh()
+
+    // Center the camera
+    const camera = sigma.getCamera()
+    camera.animate({ ratio: 1.2 }, { duration: 1000 })
+
     console.log('Graph loaded:', graph.order, 'nodes,', graph.size, 'edges')
-  }, [fileSystem, loadGraph])
+  }, [fileSystem, loadGraph, sigma])
 
   return null
 }
