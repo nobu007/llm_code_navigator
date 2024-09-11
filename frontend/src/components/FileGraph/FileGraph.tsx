@@ -1,55 +1,32 @@
-import Graph from 'graphology'
 import dynamic from 'next/dynamic'
 import React, { useEffect, useRef } from 'react'
 import { useFileSystem } from '../../hooks/useFileSystem'
 import styles from './FileGraph.module.css'
 
-const SigmaContainer = dynamic(() => import('@react-sigma/core').then(mod => mod.SigmaContainer), { ssr: false })
+const SigmaContainer = dynamic(
+  () => import('@react-sigma/core').then((mod) => mod.SigmaContainer),
+  { ssr: false }
+)
 
-interface FileSystemProps {
-  fileSystem: {
-    files: Array<{
-      id: string
-      name: string
-      type: 'file' | 'directory'
-      path: string
-    }>
-    relationships: Array<{
-      source: string
-      target: string
-    }>
-  } | null
-}
+const ControlsContainer = dynamic(
+  () => import('@react-sigma/core').then((mod) => mod.ControlsContainer),
+  { ssr: false }
+)
 
-const LoadGraph: React.FC<FileSystemProps> = ({ fileSystem }) => {
-  const sigmaRef = useRef<any>(null)
+const ZoomControl = dynamic(
+  () => import('@react-sigma/core').then((mod) => mod.ZoomControl),
+  { ssr: false }
+)
 
-  useEffect(() => {
-    if (!fileSystem || !sigmaRef.current) return
+const FullScreenControl = dynamic(
+  () => import('@react-sigma/core').then((mod) => mod.FullScreenControl),
+  { ssr: false }
+)
 
-    const graph = new Graph()
-
-    fileSystem.files.forEach(file => {
-      graph.addNode(file.id, {
-        label: file.name,
-        x: Math.random(),
-        y: Math.random(),
-        size: 15,
-        color: file.type === 'file' ? '#6366f1' : '#10b981'
-      })
-    })
-
-    fileSystem.relationships.forEach(rel => {
-      graph.addEdge(rel.source, rel.target, { type: 'arrow', size: 5, color: '#94a3b8' })
-    })
-
-    sigmaRef.current.getGraph().clear()
-    sigmaRef.current.getGraph().import(graph.export())
-    sigmaRef.current.refresh()
-  }, [fileSystem])
-
-  return null
-}
+const LoadGraph = dynamic(
+  () => import('./LoadGraph').then((mod) => mod.default),
+  { ssr: false }
+)
 
 const FileGraph: React.FC = () => {
   const { fileSystem, loading, error } = useFileSystem()
@@ -66,8 +43,24 @@ const FileGraph: React.FC = () => {
 
   return (
     <div ref={containerRef} className={styles.graphContainer}>
-      <SigmaContainer className={styles.sigmaContainer} settings={{ allowInvalidContainer: true }}>
+      <SigmaContainer
+        className={styles.sigmaContainer}
+        settings={{
+          allowInvalidContainer: true,
+          renderLabels: true,
+          labelSize: 12,
+          labelWeight: 'bold',
+          defaultNodeColor: '#999',
+          defaultEdgeColor: '#ccc',
+          defaultNodeBorderWidth: 2,
+          defaultNodeBorderColor: '#000',
+        }}
+      >
         <LoadGraph fileSystem={fileSystem} />
+        <ControlsContainer position={'bottom-right'}>
+          <ZoomControl />
+          <FullScreenControl />
+        </ControlsContainer>
       </SigmaContainer>
     </div>
   )
