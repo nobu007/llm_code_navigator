@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.endpoints import files, root
+from app.api.router import api_router
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
@@ -13,8 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(root.router)
-app.include_router(files.router, prefix="/files", tags=["files"])
+app.include_router(api_router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn

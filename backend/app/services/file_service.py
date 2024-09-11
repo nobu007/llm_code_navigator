@@ -13,7 +13,7 @@ def get_python_files(directory):
                 python_files.append(relative_path)
     return python_files
 
-def get_file_data():
+def get_files_info():
     try:
         files = get_python_files(settings.BACKEND_DIR)
         nodes = [{"id": f, "label": f} for f in files]
@@ -27,8 +27,10 @@ def get_file_data():
                     for target in files:
                         if target.replace('/', '.').replace('.py', '') == imp:
                             edges.append({"source": file, "target": target})
+        files_info={"nodes": nodes, "edges": edges}
+        print("files_info=",files_info)
 
-        return {"nodes": nodes, "edges": edges}
+        return files_info
     except Exception as e:
         logger.error(f"Error getting files: {str(e)}")
         raise

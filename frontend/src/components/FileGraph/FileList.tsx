@@ -1,30 +1,55 @@
-import { FileNode } from '@/types'
-import React from 'react'
+import { FileData, FileNode } from '@/types'
+import React, { useEffect, useState } from 'react'
+import { fetchFileData } from '../../lib/api'
 
-interface FileListProps {
-  files: FileNode[]
-  selectedFile: string | null
-  onSelectFile: (fileName: string) => void
-}
+const FileList: React.FC = () => {
+  const [fileData, setFileData] = useState<FileData | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-const FileList: React.FC<FileListProps> = ({ files, selectedFile, onSelectFile }) => {
-  return (
-    <div className="bg-white rounded-lg shadow-md p-4">
-      <h2 className="text-xl font-semibold mb-2">File List</h2>
-      <ul className="space-y-1">
-        {files.map((file) => (
-          <li key={file.id}>
-            <button
-              className={`w-full text-left px-2 py-1 rounded ${
-                selectedFile === file.id ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'
-              }`}
-              onClick={() => onSelectFile(file.id)}
-            >
-              {file.label}
-            </button>
+  useEffect(() => {
+    const loadFileData = async () => {
+      try {
+        const data = await fetchFileData()
+        setFileData(data)
+      } catch (err) {
+        setError('Failed to load file data')
+        console.error(err)
+      }
+    }
+
+    loadFileData()
+  }, [])
+
+  const renderFileTree = (nodes: FileNode[] | undefined) => {
+    if (!nodes || nodes.length === 0) {
+      return <div>No files found</div>
+    }
+
+    return (
+      <ul>
+        {nodes.map((node) => (
+          <li key={node.id}>
+            {node.type === 'file' ? '📄 ' : '📁 '}
+            {node.name}
+            {node.type === 'directory' && node.children && renderFileTree(node.children)}
           </li>
         ))}
       </ul>
+    )
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
+  if (!fileData) {
+    return <div>Loading...</div>
+  }
+
+  return (
+    <div>
+      <h2>File Structure</h2>
+      {renderFileTree(fileData.files)}
     </div>
   )
 }
