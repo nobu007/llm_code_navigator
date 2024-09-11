@@ -1,19 +1,18 @@
-import React from 'react'
+import FileGraph from '../FileGraph/FileGraph'
 import Footer from './Footer'
 import Header from './Header'
 
-interface LayoutProps {
-  children: React.ReactNode
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      {children}
+      <main className="flex-grow flex flex-col">
+        <div className="flex-grow">
+          <FileGraph />
+        </div>
+        {children}
+      </main>
       <Footer />
     </div>
   )
 }
-
-export default Layout

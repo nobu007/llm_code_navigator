@@ -1,101 +1,74 @@
-import { fetchFileContent, fetchFileData } from '@/lib/api'
-import { FileData, FileNode } from '@/types'
-import { Graph } from 'graphology'
+import Graph from 'graphology'
 import dynamic from 'next/dynamic'
-import React, { useEffect, useRef, useState } from 'react'
-import FileContent from './FileContent'
-import FileList from './FileList'
+import React, { useEffect, useRef } from 'react'
+import { useFileSystem } from '../../hooks/useFileSystem'
+import styles from './FileGraph.module.css'
 
-const DynamicSigma = dynamic(
-  () => import('react-sigma').then((mod) => mod.Sigma),
-  { ssr: false }
-)
+const SigmaContainer = dynamic(() => import('@react-sigma/core').then(mod => mod.SigmaContainer), { ssr: false })
 
-const DynamicRandomizeNodePositions = dynamic(
-  () => import('react-sigma').then((mod) => mod.RandomizeNodePositions),
-  { ssr: false }
-)
+interface FileSystemProps {
+  fileSystem: {
+    files: Array<{
+      id: string
+      name: string
+      type: 'file' | 'directory'
+      path: string
+    }>
+    relationships: Array<{
+      source: string
+      target: string
+    }>
+  } | null
+}
 
-const DynamicForceAtlas2 = dynamic(
-  () => import('react-sigma').then((mod) => mod.ForceAtlas2),
-  { ssr: false }
-)
-
-const FileGraph: React.FC = () => {
-  const [fileData, setFileData] = useState<FileData | null>(null)
-  const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [fileContent, setFileContent] = useState<string | null>(null)
-  const graphRef = useRef<Graph | null>(null)
+const LoadGraph: React.FC<FileSystemProps> = ({ fileSystem }) => {
+  const sigmaRef = useRef<any>(null)
 
   useEffect(() => {
-    const loadFileData = async () => {
-      try {
-        const data = await fetchFileData()
-        setFileData(data)
-        initializeGraph(data)
-      } catch (error) {
-        console.error('Error fetching file data:', error)
-      }
-    }
+    if (!fileSystem || !sigmaRef.current) return
 
-    loadFileData()
+    const graph = new Graph()
+
+    fileSystem.files.forEach(file => {
+      graph.addNode(file.id, {
+        label: file.name,
+        x: Math.random(),
+        y: Math.random(),
+        size: 15,
+        color: file.type === 'file' ? '#6366f1' : '#10b981'
+      })
+    })
+
+    fileSystem.relationships.forEach(rel => {
+      graph.addEdge(rel.source, rel.target, { type: 'arrow', size: 5, color: '#94a3b8' })
+    })
+
+    sigmaRef.current.getGraph().clear()
+    sigmaRef.current.getGraph().import(graph.export())
+    sigmaRef.current.refresh()
+  }, [fileSystem])
+
+  return null
+}
+
+const FileGraph: React.FC = () => {
+  const { fileSystem, loading, error } = useFileSystem()
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.style.height = '500px'
+    }
   }, [])
 
-  const initializeGraph = (data: FileData) => {
-    const graph = new Graph()
-    data.nodes.forEach((node: FileNode) => {
-      graph.addNode(node.id, { label: node.label, size: 10, color: '#6c757d' })
-    })
-    data.edges.forEach((edge) => {
-      graph.addEdge(edge.source, edge.target)
-    })
-    graphRef.current = graph
-  }
-
-  const handleNodeClick = async (node: string) => {
-    setSelectedFile(node)
-    try {
-      const content = await fetchFileContent(node)
-      setFileContent(content)
-    } catch (error) {
-      console.error('Error fetching file content:', error)
-      setFileContent('Error loading file content')
-    }
-  }
-
-  if (!fileData) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>
-  }
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="md:col-span-2">
-        <div className="bg-white rounded-lg shadow-md p-4" style={{ height: '600px' }}>
-          {graphRef.current && (
-            <DynamicSigma
-              graph={graphRef.current}
-              style={{ width: '100%', height: '100%' }}
-              onClickNode={(e) => handleNodeClick(e.data.node.id)}
-              settings={{
-                drawEdges: true,
-                clone: false,
-              }}
-            >
-              <DynamicRandomizeNodePositions>
-                <DynamicForceAtlas2 iterationsPerRender={1} timeout={3000} />
-              </DynamicRandomizeNodePositions>
-            </DynamicSigma>
-          )}
-        </div>
-      </div>
-      <div className="space-y-6">
-        <FileList
-          files={fileData.nodes}
-          selectedFile={selectedFile}
-          onSelectFile={handleNodeClick}
-        />
-        <FileContent fileName={selectedFile} content={fileContent} />
-      </div>
+    <div ref={containerRef} className={styles.graphContainer}>
+      <SigmaContainer className={styles.sigmaContainer} settings={{ allowInvalidContainer: true }}>
+        <LoadGraph fileSystem={fileSystem} />
+      </SigmaContainer>
     </div>
   )
 }
