@@ -1,48 +1,41 @@
-import { FileNode, Relationship } from '@/types/types';
-import { useLoadGraph, useSigma } from '@react-sigma/core';
-import Graph from 'graphology';
-import { circular } from 'graphology-layout';
-import React, { useEffect, useState } from 'react';
+import { FileData } from '@/types/types'
+import { useLoadGraph, useSigma } from '@react-sigma/core'
+import Graph from 'graphology'
+import { circular } from 'graphology-layout'
+import React, { useEffect } from 'react'
 
 interface LoadGraphProps {
-  files: FileNode[] | undefined
-  relationships: Relationship[] | undefined
+  fileData: FileData | null
 }
 
-const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
+const LoadGraph: React.FC<LoadGraphProps> = ({ fileData }) => {
   const loadGraph = useLoadGraph()
   const sigma = useSigma()
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!files || !relationships) {
-      console.log('Files or Relationships not available')
+    if (!fileData || !sigma) {
+      console.log('FileData or Sigma not available')
       return
     }
 
-    if (!sigma || !loadGraph) {
-      console.log('Sigma or loadGraph not available')
-      return
-    }
+    console.log('FileData:', fileData)
 
     try {
       const graph = new Graph()
 
-      // Add nodes
-      files.forEach(file => {
+      fileData.files.forEach(file => {
         graph.addNode(file.id, {
           label: file.name,
           size: file.type === 'file' ? 5 : 10,
-          color: file.type === 'file' ? '#6366f1' : '#10b981'
+          color: file.type === 'file' ? '#6366f1' : '#10b981',
+          borderColor: '#000',
+          borderWidth: 2
         })
       })
 
-      // Add edges
-      relationships.forEach(rel => {
+      fileData.relationships.forEach(rel => {
         if (graph.hasNode(rel.source) && graph.hasNode(rel.target)) {
           graph.addEdge(rel.source, rel.target, { size: 2, color: '#94a3b8' })
-        } else {
-          console.warn(`Unable to add edge: ${rel.source} -> ${rel.target}`)
         }
       })
 
@@ -70,16 +63,10 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
       camera.animate({ ratio: 1.2 }, { duration: 1000 })
       console.log('Camera animated')
 
-      setError(null)
     } catch (error) {
       console.error('Error creating graph:', error)
-      setError('Failed to create graph. Please try again.')
     }
-  }, [files, relationships, loadGraph, sigma])
-
-  if (error) {
-    return <div>Error: {error}</div>
-  }
+  }, [fileData, loadGraph, sigma])
 
   return null
 }

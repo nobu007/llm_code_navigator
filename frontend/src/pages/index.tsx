@@ -1,5 +1,6 @@
 import FileGraph from '@/components/FileGraph/FileGraph'
 import FileList from '@/components/FileGraph/FileList'
+
 import Layout from '@/components/layout/Layout'
 import { useFileSystem } from '@/hooks/useFileSystem'
 import React from 'react'
@@ -7,20 +8,21 @@ import React from 'react'
 const Home: React.FC = () => {
   const { fileSystem, loading, error, getFileContent } = useFileSystem()
 
+  console.log('Home component state:', { loading, error, fileSystem }) // デバッグログ
+
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading file system data...</div>
   }
 
   if (error) {
     return <div>Error: {error.message}</div>
   }
 
-  // fileSystemがnullでないことを確認
   if (!fileSystem) {
     return <div>No file system data available</div>
   }
 
-  console.log('Home component fileSystem:', fileSystem) // デバッグログ
+  console.log('FileSystem data:', JSON.stringify(fileSystem, null, 2)) // 詳細なデバッグログ
 
   return (
     <Layout>
@@ -33,7 +35,8 @@ const Home: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl font-semibold mb-4">File Graph</h2>
-            <FileGraph files={fileSystem.files} relationships={fileSystem.relationships} />
+            {/* <FileGraph files={fileSystem.files} relationships={fileSystem.relationships} /> */}
+            <FileGraph/>
           </div>
         </div>
       </div>

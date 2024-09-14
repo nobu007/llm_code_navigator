@@ -1,48 +1,34 @@
+import { FileData } from '@/types/types'
 import { ControlsContainer, FullScreenControl, SigmaContainer, ZoomControl } from '@react-sigma/core'
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import styles from './FileGraph.module.css'
 import LoadGraph from './LoadGraph'
 
 interface DynamicFileGraphProps {
-  fileSystem: {
-    files: Array<{
-      id: string
-      name: string
-      type: 'file' | 'directory'
-      path: string
-    }>
-    relationships: Array<{
-      source: string
-      target: string
-    }>
-  } | null
+  fileData: FileData | null
 }
 
-const DynamicFileGraph: React.FC<DynamicFileGraphProps> = ({ fileSystem }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.style.height = '500px'
-    }
-  }, [])
-
+const DynamicFileGraph: React.FC<DynamicFileGraphProps> = ({ fileData }) => {
   return (
-    <div ref={containerRef} className={styles.graphContainer}>
+    <div className={styles.graphContainer}>
       <SigmaContainer
         className={styles.sigmaContainer}
         settings={{
-          allowInvalidContainer: true,
           renderLabels: true,
           labelSize: 12,
           labelWeight: 'bold',
           defaultNodeColor: '#999',
           defaultEdgeColor: '#ccc',
+          nodeBorderColor: '#000',
+          nodeHoverColor: '#000',
           defaultNodeBorderWidth: 2,
-          defaultNodeBorderColor: '#000',
+          labelRenderedSizeThreshold: 6,
+          labelDensity: 0.07,
+          labelGridCellSize: 60,
+          zIndex: true
         }}
       >
-        <LoadGraph fileSystem={fileSystem} />
+        <LoadGraph fileData={fileData} />
         <ControlsContainer position={'bottom-right'}>
           <ZoomControl />
           <FullScreenControl />

@@ -29,7 +29,6 @@ const FileList: React.FC<FileListProps> = ({ files, onFileSelect }) => {
 
   return (
     <div>
-      <h2>File Structure</h2>
       {renderFileTree(files)}
     </div>
   )

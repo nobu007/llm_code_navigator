@@ -19,6 +19,7 @@ export function useFileSystem() {
       setFileSystem(data)
       setError(null)
     } catch (err) {
+      console.error('Error fetching file system data:', err)
       setError(err instanceof Error ? err : new Error('An unknown error occurred'))
     } finally {
       setLoading(false)
