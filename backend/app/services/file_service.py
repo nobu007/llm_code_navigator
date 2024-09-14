@@ -1,9 +1,78 @@
 import os
+from typing import List, Dict
 from app.core.config import settings
 from app.utils.ast_utils import extract_imports
 from app.core.logging import logger
+from app.models.file import FileNode, FileEdge, FileData
+from pathlib import Path
 
-def get_python_files(directory):
+
+def get_relationships(file_node_list: List[FileNode]) -> List[FileEdge]:
+    relationships=[]
+    for file_node in file_node_list:
+        if file_node.children:
+            for child in file_node.children:
+                 relationships.append(FileEdge(source=file_node.name,target=child))
+    return relationships
+
+
+def get_file_data() -> FileData:
+    try:
+        files_info = get_files_info()
+        relationships = get_relationships(files_info)
+        return FileData(files=files_info, relationships=relationships)
+    except Exception as e:
+        logger.error(f"Error in get_file_data: {str(e)}")
+        raise
+
+
+def get_files_info() -> List[FileNode]:
+    try:
+        files = get_python_files(settings.BACKEND_DIR)
+        file_node_list=[]
+
+        for i, file in enumerate(files):
+            file_node = get_file_info(file, files, i)
+            file_node_list.append(file_node)
+        print("file_node_list=", file_node_list)
+        return file_node_list
+    except Exception as e:
+        logger.error(f"Error getting files: {str(e)}")
+        raise
+
+
+def get_file_info(file_path: str, all_files: List[str], index: int) -> FileNode:
+    # ファイルの基本情報を取得
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"{file_path} does not exist.")
+
+    # インポートを抽出する
+    with open(file_path, 'r') as f:
+        content = f.read()
+        imports = extract_imports(content)  # ここでインポートを抽出
+
+    # 絶対パスを取得
+    children = []
+    for imp in imports:
+        # インポート文を絶対パスに変換
+        normalized_import = imp.replace('.', '/').replace('_', '.')
+        for target in all_files:
+            if normalized_import == target.replace('/', '.').replace('.py', ''):
+                # 絶対パスを追加
+                children.append(str(Path(file_path).parent / target))
+
+    file_node = FileNode(
+        id=str(index) + "_" + path.name,  # IDとしてファイルのパスを使用
+        name=str(path.absolute()),
+        type='file',
+        children=children,
+    )
+
+    return file_node
+
+
+def get_python_files(directory: str) -> List[str]:
     python_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -13,39 +82,37 @@ def get_python_files(directory):
                 python_files.append(relative_path)
     return python_files
 
-def get_files_info():
-    try:
-        files = get_python_files(settings.BACKEND_DIR)
-        nodes = [{"id": f, "label": f} for f in files]
-        edges = []
 
-        for file in files:
-            with open(os.path.join(settings.BACKEND_DIR, file), 'r') as f:
-                content = f.read()
-                imports = extract_imports(content)
-                for imp in imports:
-                    for target in files:
-                        if target.replace('/', '.').replace('.py', '') == imp:
-                            edges.append({"source": file, "target": target})
-        files_info={"nodes": nodes, "edges": edges}
-        print("files_info=",files_info)
-
-        return files_info
-    except Exception as e:
-        logger.error(f"Error getting files: {str(e)}")
-        raise
-
-def get_file_content(file_path: str):
+def get_file_content(file_path: str) -> str:
     try:
         full_path = os.path.join(settings.BACKEND_DIR, file_path)
-        if not full_path.startswith(settings.BACKEND_DIR):
+        if not os.path.abspath(full_path).startswith(os.path.abspath(settings.BACKEND_DIR)):
             raise PermissionError("Access denied")
 
         with open(full_path, 'r') as f:
             content = f.read()
         return content
     except FileNotFoundError:
+        logger.error(f"File not found: {file_path}")
+        raise
+    except PermissionError as e:
+        logger.error(f"Permission error: {str(e)}")
         raise
     except Exception as e:
         logger.error(f"Error reading file {file_path}: {str(e)}")
         raise
+
+
+def main():
+    # for test
+    settings.BACKEND_DIR = "./"
+    try:
+        file_data = get_file_data()
+        # ここでfile_dataを用いて何か処理を行う
+        logger.info("File data retrieved successfully.")
+    except Exception as e:
+        logger.error(f"Error in main: {str(e)}")
+
+
+if __name__ == "__main__":
+    main()

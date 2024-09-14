@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from app.models.file import FileData, FileContent
-from app.services.file_service import get_files_info, get_file_content
+from app.services.file_service import get_file_data, get_file_content
 
 router = APIRouter()
 
 @router.get("/files_info", response_model=FileData)
 async def api_get_files_info():
     try:
-        return get_files_info()
+        return get_file_data()
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
 
