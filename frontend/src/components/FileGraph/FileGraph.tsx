@@ -1,18 +1,29 @@
+import { FileNode, Relationship } from '@/types/types'
 import dynamic from 'next/dynamic'
 import React from 'react'
-import { useFileSystem } from '../../hooks/useFileSystem'
 
-const DynamicFileGraph = dynamic(() => import('./DynamicFileGraph'), {
-  ssr: false,
-})
+const DynamicSigmaContainer = dynamic(
+  () => import('./DynamicSigmaContainer'),
+  { ssr: false }
+)
 
-const FileGraph: React.FC = () => {
-  const { fileSystem, loading, error } = useFileSystem()
+interface FileGraphProps {
+  files: FileNode[] | undefined
+  relationships: Relationship[] | undefined
+}
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
+const FileGraph: React.FC<FileGraphProps> = ({ files, relationships }) => {
+  console.log('FileGraph received:', { files, relationships }) // デバッグログ
 
-  return <DynamicFileGraph fileSystem={fileSystem} />
+  if (!files || !relationships) {
+    return <div>Loading graph data...</div>
+  }
+
+  return (
+    <div className="w-full h-[500px]">
+      <DynamicSigmaContainer files={files} relationships={relationships} />
+    </div>
+  )
 }
 
 export default FileGraph

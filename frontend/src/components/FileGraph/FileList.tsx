@@ -1,25 +1,12 @@
-import { FileData, FileNode } from '@/types/types'
-import React, { useEffect, useState } from 'react'
-import { fetchFileData } from '../../lib/api'
+import { FileNode } from '@/types/types'
+import React from 'react'
 
-const FileList: React.FC = () => {
-  const [fileData, setFileData] = useState<FileData | null>(null)
-  const [error, setError] = useState<string | null>(null)
+interface FileListProps {
+  files: FileNode[] | undefined
+  onFileSelect?: (fileName: string) => void
+}
 
-  useEffect(() => {
-    const loadFileData = async () => {
-      try {
-        const data = await fetchFileData()
-        setFileData(data)
-      } catch (err) {
-        setError('Failed to load file data')
-        console.error(err)
-      }
-    }
-
-    loadFileData()
-  }, [])
-
+const FileList: React.FC<FileListProps> = ({ files, onFileSelect }) => {
   const renderFileTree = (nodes: FileNode[] | undefined) => {
     if (!nodes || nodes.length === 0) {
       return <div>No files found</div>
@@ -29,8 +16,10 @@ const FileList: React.FC = () => {
       <ul>
         {nodes.map((node) => (
           <li key={node.id}>
-            {node.type === 'file' ? '📄 ' : '📁 '}
-            {node.name}
+            <span onClick={() => onFileSelect && onFileSelect(node.name)}>
+              {node.type === 'file' ? '📄 ' : '📁 '}
+              {node.name}
+            </span>
             {node.type === 'directory' && node.children && renderFileTree(node.children)}
           </li>
         ))}
@@ -38,18 +27,10 @@ const FileList: React.FC = () => {
     )
   }
 
-  if (error) {
-    return <div>Error: {error}</div>
-  }
-
-  if (!fileData) {
-    return <div>Loading...</div>
-  }
-
   return (
     <div>
       <h2>File Structure</h2>
-      {renderFileTree(fileData.files)}
+      {renderFileTree(files)}
     </div>
   )
 }
