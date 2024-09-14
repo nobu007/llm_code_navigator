@@ -1,6 +1,8 @@
 export interface FileNode {
   id: string
-  label: string
+  name: string
+  type: 'file' | 'directory'
+  children?: FileNode[]
 }
 
 export interface FileEdge {
@@ -9,6 +11,6 @@ export interface FileEdge {
 }
 
 export interface FileData {
-  nodes: FileNode[]
-  edges: FileEdge[]
+  files: FileNode[]
+  relationships: FileEdge[]
 }

@@ -1,4 +1,4 @@
-import { FileData } from '@/types'
+import { FileData } from '@/types/types'
 
 const API_URL = 'http://localhost:9000'
 

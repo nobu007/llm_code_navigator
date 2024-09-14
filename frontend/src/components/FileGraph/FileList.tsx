@@ -1,4 +1,4 @@
-import { FileData, FileNode } from '@/types'
+import { FileData, FileNode } from '@/types/types'
 import React, { useEffect, useState } from 'react'
 import { fetchFileData } from '../../lib/api'
 
