@@ -1,19 +1,19 @@
-import { FileData, FileNode } from '@/types/types'
+import { FileNode } from '@/types/types'
 import dynamic from 'next/dynamic'
 import React from 'react'
 
-const DynamicFileList = dynamic(() => import('./FileList'), {
+const FileList = dynamic(() => import('./FileList'), {
   ssr: false,
   loading: () => <p>Loading file list...</p>
 })
 
 interface DynamicFileListProps {
-  files: FileData
+  files: FileNode[]
   onFileSelect: (file: FileNode) => void
 }
 
-const FileListWrapper: React.FC<DynamicFileListProps> = ({ files, onFileSelect }) => {
-  return <DynamicFileList files={files.files} onFileSelect={onFileSelect} />
+const DynamicFileList: React.FC<DynamicFileListProps> = ({ files, onFileSelect }) => {
+  return <FileList files={files} onFileSelect={onFileSelect} />
 }
 
-export default FileListWrapper
+export default DynamicFileList

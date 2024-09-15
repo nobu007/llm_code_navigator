@@ -1,77 +1,50 @@
-import { FileData } from '@/types/types'
-import { useLoadGraph, useSigma } from '@react-sigma/core'
-import Graph from 'graphology'
-import { circular } from 'graphology-layout'
-import React, { useEffect } from 'react'
+import { FileEdge, FileNode } from "@/types/types";
+import { useCamera, useLoadGraph } from "@react-sigma/core";
+import Graph from "graphology";
+import { random } from "graphology-layout";
+import React, { useEffect } from "react";
 
 interface LoadGraphProps {
-  fileData: FileData | null
+  files: FileNode[];
+  relationships: FileEdge[];
 }
 
-const LoadGraph: React.FC<LoadGraphProps> = ({ fileData }) => {
-  const loadGraph = useLoadGraph()
-  const sigma = useSigma()
+const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
+  const loadGraph = useLoadGraph();
+  const camera = useCamera();
 
   useEffect(() => {
-    if (!fileData || !sigma) {
-      console.log('FileData or Sigma not available')
-      return
+    const graph = new Graph();
+
+    files.forEach((file) => {
+      graph.addNode(file.id, {
+        label: file.name,
+        size: file.type === "file" ? 10 : 15,
+        color: file.type === "file" ? "#6366f1" : "#10b981",
+      });
+    });
+
+    relationships.forEach((rel) => {
+      if (graph.hasNode(rel.source) && graph.hasNode(rel.target)) {
+        graph.addEdge(rel.source, rel.target, { size: 2, color: "#94a3b8" });
+      }
+    });
+
+    // Apply layout
+    random.assign(graph);
+
+    loadGraph(graph);
+
+    // Center the camera
+    if (graph.order > 0) {
+      const { x, y } = graph.getNodeAttributes(graph.nodes()[0]);
+      camera.goto({ x, y, ratio: 1 }, { duration: 500 });
     }
 
-    console.log('FileData:', fileData)
+    console.log("Graph loaded:", graph.order, "nodes,", graph.size, "edges");
+  }, [loadGraph, files, relationships, camera]);
 
-    try {
-      const graph = new Graph()
+  return null;
+};
 
-      fileData.files.forEach(file => {
-        graph.addNode(file.id, {
-          label: file.name,
-          size: file.type === 'file' ? 5 : 10,
-          color: file.type === 'file' ? '#6366f1' : '#10b981',
-          x: Math.random(),
-          y: Math.random()
-        })
-      })
-
-      fileData.relationships.forEach(rel => {
-        if (graph.hasNode(rel.source) && graph.hasNode(rel.target)) {
-          graph.addEdge(rel.source, rel.target, { size: 2, color: '#94a3b8' })
-        }
-      })
-
-      console.log('Graph created with', graph.order, 'nodes and', graph.size, 'edges')
-
-      // Apply a circular layout
-      circular.assign(graph)
-
-      // Load the graph
-      loadGraph(graph)
-
-      // Update node positions
-      graph.forEachNode((node, attributes) => {
-        const nodeDisplayData = sigma.getNodeDisplayData(node)
-        if (nodeDisplayData) {
-          nodeDisplayData.x = attributes.x
-          nodeDisplayData.y = attributes.y
-        }
-      })
-
-      // Refresh the rendering
-      sigma.refresh()
-      console.log('Graph refreshed')
-
-      // Center the camera
-      const camera = sigma.getCamera()
-      const state = camera.getState()
-      camera.animate({ ...state, ratio: 1.2 }, { duration: 1000 })
-      console.log('Camera animated')
-
-    } catch (error) {
-      console.error('Error creating graph:', error)
-    }
-  }, [fileData, loadGraph, sigma])
-
-  return null
-}
-
-export default LoadGraph
+export default LoadGraph;

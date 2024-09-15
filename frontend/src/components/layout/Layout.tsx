@@ -42,7 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
       <h1 className="text-3xl font-bold mb-6">LLM Code Navigator</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <DynamicFileList files={fileSystem} onFileSelect={handleFileSelect} />
+          <DynamicFileList files={fileSystem.files} onFileSelect={handleFileSelect} />
         </div>
         <div>
           <DynamicFileGraph fileData={fileSystem} />

@@ -1,26 +1,18 @@
-import { FileData, FileEdge, FileNode } from '@/types/types'
+import { FileData } from '@/types/types'
 import dynamic from 'next/dynamic'
 import React from 'react'
 
-const DynamicSigmaContainer = dynamic(() => import('./DynamicSigmaContainer'), {
+const FileGraph = dynamic(() => import('./FileGraph'), {
   ssr: false,
-  loading: () => <p>Loading graph...</p>
+  loading: () => <p>Loading file graph...</p>
 })
 
 interface DynamicFileGraphProps {
-  fileData: FileData | null
+  fileData: FileData
 }
 
 const DynamicFileGraph: React.FC<DynamicFileGraphProps> = ({ fileData }) => {
-  if (!fileData) {
-    return <p>No file data available</p>
-  }
-
-  const files: FileNode[] = fileData.files
-
-  const relationships: FileEdge[] =fileData.relationships
-
-  return <DynamicSigmaContainer files={files} relationships={relationships} />
+  return <FileGraph files={fileData.files} relationships={fileData.relationships} />
 }
 
 export default DynamicFileGraph

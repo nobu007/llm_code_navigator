@@ -1,11 +1,7 @@
 import { FileEdge, FileNode } from '@/types/types'
-import dynamic from 'next/dynamic'
 import React from 'react'
-
-const DynamicSigmaContainer = dynamic(
-  () => import('./DynamicSigmaContainer'),
-  { ssr: false, loading: () => <div>Loading graph...</div> }
-)
+import DynamicSigmaContainer from './DynamicSigmaContainer'
+import LoadGraph from './LoadGraph'
 
 interface FileGraphProps {
   files: FileNode[]
@@ -13,20 +9,10 @@ interface FileGraphProps {
 }
 
 const FileGraph: React.FC<FileGraphProps> = ({ files, relationships }) => {
-  console.log('FileGraph received:', { files, relationships })
-
-  if (!files) {
-    return <div>No file data available</div>
-  }
-
-  if (files.length === 0) {
-    return <div>No files in the data</div>
-  }
-
   return (
-    <div style={{ width: '100%', height: '500px' }}>
-      <DynamicSigmaContainer files={files} relationships={relationships} />
-    </div>
+    <DynamicSigmaContainer files={files} relationships={relationships}>
+      <LoadGraph files={files} relationships={relationships} />
+    </DynamicSigmaContainer>
   )
 }
 
