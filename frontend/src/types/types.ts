@@ -1,3 +1,5 @@
+// @/types/types.ts
+
 export interface FileNode {
   id: string
   name: string
@@ -14,3 +16,6 @@ export interface FileData {
   files: FileNode[]
   relationships: FileEdge[]
 }
+
+// Relationship型をエクスポートする
+export type Relationship = FileEdge;

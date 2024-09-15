@@ -8,16 +8,16 @@ interface FileContentProps {
 const FileContent: React.FC<FileContentProps> = ({ fileName, content }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4">
-      <h2 className="text-xl font-semibold mb-2">File Content</h2>
+      <h2 className="text-2xl font-semibold mb-4">File Content</h2>
       {fileName ? (
         <>
-          <p className="text-sm text-gray-600 mb-2">{fileName}</p>
-          <pre className="bg-gray-100 p-2 rounded text-sm overflow-x-auto">
-            {content || 'Loading...'}
+          <p className="text-sm text-muted-foreground mb-2" aria-label="File name">{fileName}</p>
+          <pre className="bg-muted p-4 rounded-md text-sm overflow-x-auto whitespace-pre-wrap" aria-label="File content">
+            <code>{content || 'Loading...'}</code>
           </pre>
         </>
       ) : (
-        <p className="text-gray-600">Select a file to view its content</p>
+        <p className="text-muted-foreground">Select a file to view its content</p>
       )}
     </div>
   )

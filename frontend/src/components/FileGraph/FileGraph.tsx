@@ -1,49 +1,33 @@
-import { ControlsContainer, FullScreenControl, SigmaContainer, ZoomControl, useLoadGraph, useRegisterEvents } from '@react-sigma/core';
-import '@react-sigma/core/lib/react-sigma.min.css';
-import { LayoutForceAtlas2Control } from '@react-sigma/layout-forceatlas2';
-import Graph from 'graphology';
-import { useEffect } from 'react';
+import { FileEdge, FileNode } from '@/types/types'
+import dynamic from 'next/dynamic'
+import React from 'react'
 
-const GraphComponent = () => {
-  const LoadGraph = () => {
-    const loadGraph = useLoadGraph();
-    const registerEvents = useRegisterEvents();
+const DynamicSigmaContainer = dynamic(
+  () => import('./DynamicSigmaContainer'),
+  { ssr: false, loading: () => <div>Loading graph...</div> }
+)
 
-    useEffect(() => {
-      const graph = new Graph();
+interface FileGraphProps {
+  files: FileNode[]
+  relationships: FileEdge[]
+}
 
-      // Add nodes
-      graph.addNode('A', { x: 0, y: 0, size: 10, label: 'Node A', color: '#6c757d' });
-      graph.addNode('B', { x: 1, y: 1, size: 10, label: 'Node B', color: '#6c757d' });
-      graph.addNode('C', { x: -1, y: -1, size: 10, label: 'Node C', color: '#6c757d' });
+const FileGraph: React.FC<FileGraphProps> = ({ files, relationships }) => {
+  console.log('FileGraph received:', { files, relationships })
 
-      // Add edges
-      graph.addEdge('A', 'B');
-      graph.addEdge('B', 'C');
-      graph.addEdge('C', 'A');
+  if (!files) {
+    return <div>No file data available</div>
+  }
 
-      loadGraph(graph);
-
-      // Optional: Register events
-      registerEvents({
-        clickNode: (event) => console.log('Clicked node: ', event.node),
-        clickEdge: (event) => console.log('Clicked edge: ', event.edge),
-      });
-    }, [loadGraph, registerEvents]);
-
-    return null;
-  };
+  if (files.length === 0) {
+    return <div>No files in the data</div>
+  }
 
   return (
-    <SigmaContainer style={{ height: '500px', width: '100%' }}>
-      <LoadGraph />
-      <ControlsContainer position={'bottom-right'}>
-        <ZoomControl />
-        <FullScreenControl />
-        <LayoutForceAtlas2Control />
-      </ControlsContainer>
-    </SigmaContainer>
-  );
-};
+    <div style={{ width: '100%', height: '500px' }}>
+      <DynamicSigmaContainer files={files} relationships={relationships} />
+    </div>
+  )
+}
 
-export default GraphComponent;
+export default FileGraph

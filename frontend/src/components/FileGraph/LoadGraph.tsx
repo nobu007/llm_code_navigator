@@ -28,8 +28,8 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ fileData }) => {
           label: file.name,
           size: file.type === 'file' ? 5 : 10,
           color: file.type === 'file' ? '#6366f1' : '#10b981',
-          borderColor: '#000',
-          borderWidth: 2
+          x: Math.random(),
+          y: Math.random()
         })
       })
 
@@ -49,9 +49,11 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ fileData }) => {
 
       // Update node positions
       graph.forEachNode((node, attributes) => {
-        const { x, y } = attributes
-        sigma.getNodeDisplayData(node).x = x
-        sigma.getNodeDisplayData(node).y = y
+        const nodeDisplayData = sigma.getNodeDisplayData(node)
+        if (nodeDisplayData) {
+          nodeDisplayData.x = attributes.x
+          nodeDisplayData.y = attributes.y
+        }
       })
 
       // Refresh the rendering
@@ -60,7 +62,8 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ fileData }) => {
 
       // Center the camera
       const camera = sigma.getCamera()
-      camera.animate({ ratio: 1.2 }, { duration: 1000 })
+      const state = camera.getState()
+      camera.animate({ ...state, ratio: 1.2 }, { duration: 1000 })
       console.log('Camera animated')
 
     } catch (error) {
