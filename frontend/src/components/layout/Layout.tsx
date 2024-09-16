@@ -34,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
 
   const handleFileSelect = async (file: FileNode) => {
     setSelectedFile(file)
+    setActiveTab(0) // Switch to Contents tab
     try {
       const content = await getFileContent(file.name)
       setFileContent(content)
@@ -45,7 +46,6 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
 
   useEffect(() => {
     if (activeTab === 1) {
-      // Force re-render of FileGraph when its tab becomes active
       const graphComponent = document.querySelector('.sigma-container')
       if (graphComponent) {
         graphComponent.dispatchEvent(new Event('resize'))
@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
                   <DynamicFileContent fileName={selectedFile?.name || null} content={fileContent} />
                 </TabPanel>
                 <TabPanel>
-                  <DynamicFileGraph fileData={fileSystem} />
+                  <DynamicFileGraph fileData={fileSystem} onNodeClick={handleFileSelect} />
                 </TabPanel>
               </TabPanels>
             </Tabs>

@@ -7,9 +7,10 @@ import React, { useEffect, useRef } from "react";
 interface LoadGraphProps {
   files: FileNode[];
   relationships: FileEdge[];
+  onNodeClick: (file: FileNode) => void;
 }
 
-const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
+const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships, onNodeClick }) => {
   const loadGraph = useLoadGraph();
   const camera = useCamera();
   const sigma = useSigma();
@@ -24,6 +25,7 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
         label: file.name,
         size: file.type === "file" ? 10 : 15,
         color: file.type === "file" ? "#6366f1" : "#10b981",
+        file: file,
       });
     });
 
@@ -45,6 +47,12 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
       camera.goto({ x, y, ratio: 1 }, { duration: 500 });
     }
 
+    sigma.on("clickNode", (event) => {
+      const nodeId = event.node;
+      const nodeAttributes = graph.getNodeAttributes(nodeId);
+      onNodeClick(nodeAttributes.file);
+    });
+
     console.log("Graph loaded:", graph.order, "nodes,", graph.size, "edges");
     sigma.refresh();
 
@@ -52,8 +60,9 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
       if (graphRef.current) {
         graphRef.current.clear();
       }
+      sigma.removeAllListeners("clickNode");
     };
-  }, [loadGraph, files, relationships, camera, sigma]);
+  }, [loadGraph, files, relationships, camera, sigma, onNodeClick]);
 
   return null;
 };
