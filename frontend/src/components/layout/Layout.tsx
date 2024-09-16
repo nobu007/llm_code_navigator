@@ -29,7 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
   const handleFileSelect = async (file: FileNode) => {
     setSelectedFile(file)
     try {
-      const content = await getFileContent(file.id)
+      const content = await getFileContent(file.name)
       setFileContent(content)
     } catch (error) {
       console.error('Error fetching file content:', error)
