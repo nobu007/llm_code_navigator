@@ -1,19 +1,22 @@
 import { FileData, FileNode } from '@/types/types';
-import { Box, useColorModeValue } from '@chakra-ui/react';
+import { Box, Portal, useColorModeValue } from '@chakra-ui/react';
 import { ControlsContainer, FullScreenControl, SigmaContainer, ZoomControl } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import React, { useEffect, useRef, useState } from 'react';
 import LoadGraph from './LoadGraph';
+import NodeMenu from './NodeMenu';
 
 interface FileGraphProps {
   fileData: FileData
-  onNodeClick: (file: FileNode) => void
+  onNodeSelect: (file: FileNode) => void
 }
 
-const DynamicFileGraph: React.FC<FileGraphProps> = ({ fileData, onNodeClick }) => {
+const DynamicFileGraph: React.FC<FileGraphProps> = ({ fileData, onNodeSelect }) => {
   const bgColor = useColorModeValue('white', 'gray.800')
   const [containerReady, setContainerReady] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [selectedNode, setSelectedNode] = useState<FileNode | null>(null)
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     setContainerReady(true)
@@ -21,6 +24,18 @@ const DynamicFileGraph: React.FC<FileGraphProps> = ({ fileData, onNodeClick }) =
       containerRef.current.getBoundingClientRect()
     }
   }, [])
+
+  const handleNodeClick = (file: FileNode, event: MouseEvent) => {
+    setSelectedNode(file)
+    setMenuPosition({ x: event.clientX, y: event.clientY })
+  }
+
+  const handleViewContent = () => {
+    if (selectedNode) {
+      onNodeSelect(selectedNode)
+    }
+    setSelectedNode(null)
+  }
 
   if (fileData.files.length === 0) {
     return (
@@ -31,7 +46,7 @@ const DynamicFileGraph: React.FC<FileGraphProps> = ({ fileData, onNodeClick }) =
   }
 
   return (
-    <Box ref={containerRef} width="100%" height="500px" bg={bgColor} borderRadius="md" overflow="hidden">
+    <Box ref={containerRef} width="100%" height="500px" bg={bgColor} borderRadius="md" overflow="hidden" position="relative">
       {containerReady && (
         <SigmaContainer
           style={{ width: '100%', height: '100%' }}
@@ -43,13 +58,22 @@ const DynamicFileGraph: React.FC<FileGraphProps> = ({ fileData, onNodeClick }) =
             defaultEdgeType: 'arrow',
           }}
         >
-          <LoadGraph files={fileData.files} relationships={fileData.relationships} onNodeClick={onNodeClick} />
+          <LoadGraph files={fileData.files} relationships={fileData.relationships} onNodeClick={handleNodeClick} />
           <ControlsContainer position={"bottom-right"}>
             <ZoomControl />
             <FullScreenControl />
           </ControlsContainer>
         </SigmaContainer>
       )}
+      <Portal>
+        <Box position="absolute" left={menuPosition.x} top={menuPosition.y}>
+          <NodeMenu
+            selectedNode={selectedNode}
+            onViewContent={handleViewContent}
+            onClose={() => setSelectedNode(null)}
+          />
+        </Box>
+      </Portal>
     </Box>
   )
 }

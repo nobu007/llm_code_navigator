@@ -7,7 +7,7 @@ import React, { useEffect, useRef } from "react";
 interface LoadGraphProps {
   files: FileNode[];
   relationships: FileEdge[];
-  onNodeClick: (file: FileNode) => void;
+  onNodeClick: (file: FileNode, event: MouseEvent) => void;
 }
 
 const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships, onNodeClick }) => {
@@ -50,7 +50,7 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships, onNodeClick
     sigma.on("clickNode", (event) => {
       const nodeId = event.node;
       const nodeAttributes = graph.getNodeAttributes(nodeId);
-      onNodeClick(nodeAttributes.file);
+      onNodeClick(nodeAttributes.file, event.event.original as MouseEvent);
     });
 
     console.log("Graph loaded:", graph.order, "nodes,", graph.size, "edges");

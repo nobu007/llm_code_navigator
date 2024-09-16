@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
                   <DynamicFileContent fileName={selectedFile?.name || null} content={fileContent} />
                 </TabPanel>
                 <TabPanel>
-                  <DynamicFileGraph fileData={fileSystem} onNodeClick={handleFileSelect} />
+                  <DynamicFileGraph fileData={fileSystem} onNodeSelect={handleFileSelect} />
                 </TabPanel>
               </TabPanels>
             </Tabs>
