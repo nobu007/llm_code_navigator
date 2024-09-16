@@ -34,7 +34,7 @@ destroy: deps
 	docker volume prune -f
 
 # すべてのターゲットを実行
-all: deps compose-destroy compose-up
+all: deps destroy up
 
 ######################
 # HELP
