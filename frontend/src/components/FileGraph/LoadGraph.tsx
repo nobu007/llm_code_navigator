@@ -1,8 +1,8 @@
 import { FileEdge, FileNode } from "@/types/types";
-import { useCamera, useLoadGraph } from "@react-sigma/core";
+import { useCamera, useLoadGraph, useSigma } from "@react-sigma/core";
 import Graph from "graphology";
-import { random } from "graphology-layout";
-import React, { useEffect } from "react";
+import { circular } from "graphology-layout";
+import React, { useEffect, useRef } from "react";
 
 interface LoadGraphProps {
   files: FileNode[];
@@ -12,9 +12,12 @@ interface LoadGraphProps {
 const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
   const loadGraph = useLoadGraph();
   const camera = useCamera();
+  const sigma = useSigma();
+  const graphRef = useRef<Graph | null>(null);
 
   useEffect(() => {
     const graph = new Graph();
+    graphRef.current = graph;
 
     files.forEach((file) => {
       graph.addNode(file.id, {
@@ -26,23 +29,31 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships }) => {
 
     relationships.forEach((rel) => {
       if (graph.hasNode(rel.source) && graph.hasNode(rel.target)) {
-        graph.addEdge(rel.source, rel.target, { size: 2, color: "#94a3b8" });
+        graph.addEdge(rel.source, rel.target, {
+          size: 2,
+          color: "#94a3b8",
+          type: "arrow",
+        });
       }
     });
 
-    // Apply layout
-    random.assign(graph);
-
+    circular.assign(graph);
     loadGraph(graph);
 
-    // Center the camera
     if (graph.order > 0) {
       const { x, y } = graph.getNodeAttributes(graph.nodes()[0]);
       camera.goto({ x, y, ratio: 1 }, { duration: 500 });
     }
 
     console.log("Graph loaded:", graph.order, "nodes,", graph.size, "edges");
-  }, [loadGraph, files, relationships, camera]);
+    sigma.refresh();
+
+    return () => {
+      if (graphRef.current) {
+        graphRef.current.clear();
+      }
+    };
+  }, [loadGraph, files, relationships, camera, sigma]);
 
   return null;
 };

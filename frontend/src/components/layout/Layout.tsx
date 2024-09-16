@@ -1,8 +1,8 @@
 import { FileData, FileNode } from '@/types/types'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
-import { Box, ChakraProvider, HStack, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, useColorMode, useColorModeValue } from "@chakra-ui/react"
+import { Box, HStack, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, useColorMode, useColorModeValue } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const DynamicFileList = dynamic(() => import('@/components/FileGraph/DynamicFileList'), {
   ssr: false,
@@ -30,6 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const bgColor = useColorModeValue("gray.50", "gray.900")
   const color = useColorModeValue("gray.900", "gray.50")
+  const [activeTab, setActiveTab] = useState(0)
 
   const handleFileSelect = async (file: FileNode) => {
     setSelectedFile(file)
@@ -42,42 +43,50 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
     }
   }
 
+  useEffect(() => {
+    if (activeTab === 1) {
+      // Force re-render of FileGraph when its tab becomes active
+      const graphComponent = document.querySelector('.sigma-container')
+      if (graphComponent) {
+        graphComponent.dispatchEvent(new Event('resize'))
+      }
+    }
+  }, [activeTab])
+
   return (
-    <ChakraProvider>
-      <Box bg={bgColor} color={color} minH="100vh">
-        <VStack spacing={4} align="stretch" p={4}>
-          <HStack justifyContent="space-between">
-            <Box fontSize="2xl" fontWeight="bold">LLM Code Navigator</Box>
-            <IconButton
-              icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-              onClick={toggleColorMode}
-              aria-label="Toggle color mode"
-            />
-          </HStack>
-          <HStack align="stretch" spacing={4} height="calc(100vh - 100px)">
-            <Box width="300px" overflowY="auto" borderWidth={1} borderRadius="md" p={2}>
-              <DynamicFileList files={fileSystem.files} onFileSelect={handleFileSelect} />
-            </Box>
-            <Box flex={1}>
-              <Tabs isFitted variant="enclosed">
-                <TabList mb="1em">
-                  <Tab>File Content</Tab>
-                  <Tab>File Graph</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <DynamicFileContent fileName={selectedFile?.name || null} content={fileContent} />
-                  </TabPanel>
-                  <TabPanel>
-                    <DynamicFileGraph fileData={fileSystem} />
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </Box>
-          </HStack>
-        </VStack>
-      </Box>
-    </ChakraProvider>
+    <Box bg={bgColor} color={color} minH="100vh">
+      <VStack spacing={4} align="stretch" p={4}>
+        <HStack justifyContent="space-between">
+          <Box fontSize="2xl" fontWeight="bold">LLM Code Navigator</Box>
+          <IconButton
+            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            onClick={toggleColorMode}
+            aria-label="Toggle color mode"
+          />
+        </HStack>
+        <HStack align="stretch" spacing={4} height="calc(100vh - 100px)">
+          <Box width="300px" overflowY="auto" borderWidth={1} borderRadius="md" p={2}>
+            <DynamicFileList files={fileSystem.files} onFileSelect={handleFileSelect} />
+          </Box>
+          <Box flex={1}>
+            <Tabs isFitted variant="enclosed" index={activeTab} onChange={(index) => setActiveTab(index)}>
+              <TabList mb="1em">
+                <Tab>File Content</Tab>
+                <Tab>File Graph</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <DynamicFileContent fileName={selectedFile?.name || null} content={fileContent} />
+                </TabPanel>
+                <TabPanel>
+                  <DynamicFileGraph fileData={fileSystem} />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Box>
+        </HStack>
+      </VStack>
+    </Box>
   )
 }
 
