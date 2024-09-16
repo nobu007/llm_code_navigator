@@ -1,6 +1,6 @@
 import { FileData, FileNode } from '@/types/types'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
-import { Box, HStack, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, useColorMode, useColorModeValue } from "@chakra-ui/react"
+import { Box, HStack, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, useColorMode, useColorModeValue } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
 import React, { useEffect, useState } from 'react'
 
@@ -52,6 +52,14 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
       }
     }
   }, [activeTab])
+
+  if (!fileSystem || !fileSystem.files || fileSystem.files.length === 0) {
+    return (
+      <Box bg={bgColor} color={color} minH="100vh" display="flex" alignItems="center" justifyContent="center">
+        <Text fontSize="xl">No files found in the backend folder.</Text>
+      </Box>
+    )
+  }
 
   return (
     <Box bg={bgColor} color={color} minH="100vh">
