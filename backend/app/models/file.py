@@ -23,3 +23,7 @@ class FileContent(BaseModel):
     content: str
 
 
+class FilePath(BaseModel):
+    full: str  # full path
+    base: str  # base path(settings.BACKEND_DIR)
+    relative: str  # relative path

@@ -3,16 +3,16 @@ from typing import List, Dict
 from app.core.config import settings
 from app.utils.ast_utils import extract_imports
 from app.core.logging import logger
-from app.models.file import FileNode, FileEdge, FileData
+from app.models.file import FileNode, FileEdge, FileData, FilePath
 from pathlib import Path
 
 
 def get_relationships(file_node_list: List[FileNode]) -> List[FileEdge]:
-    relationships=[]
+    relationships = []
     for file_node in file_node_list:
         if file_node.children:
             for child in file_node.children:
-                 relationships.append(FileEdge(source=file_node.name,target=child))
+                relationships.append(FileEdge(source=file_node.name, target=child))
     return relationships
 
 
@@ -28,11 +28,11 @@ def get_file_data() -> FileData:
 
 def get_files_info() -> List[FileNode]:
     try:
-        files = get_python_files(settings.BACKEND_DIR)
-        file_node_list=[]
+        file_path_list = get_python_file_path_list(settings.BACKEND_DIR)
+        file_node_list = []
 
-        for i, file in enumerate(files):
-            file_node = get_file_info(file, files, i)
+        for i, file_path in enumerate(file_path_list):
+            file_node = get_file_info(file_path, file_path_list, i)
             file_node_list.append(file_node)
         print("file_node_list=", file_node_list)
         return file_node_list
@@ -41,14 +41,15 @@ def get_files_info() -> List[FileNode]:
         raise
 
 
-def get_file_info(file_path: str, all_files: List[str], index: int) -> FileNode:
+def get_file_info(file_path: FilePath, all_file_path_list: List[FilePath], index: int) -> FileNode:
     # ファイルの基本情報を取得
-    path = Path(file_path)
+    full_path = file_path.full
+    path = Path(full_path)
     if not path.exists():
-        raise FileNotFoundError(f"{file_path} does not exist.")
+        raise FileNotFoundError(f"{full_path} does not exist.")
 
     # インポートを抽出する
-    with open(file_path, 'r') as f:
+    with open(full_path, 'r') as f:
         content = f.read()
         imports = extract_imports(content)  # ここでインポートを抽出
 
@@ -57,14 +58,15 @@ def get_file_info(file_path: str, all_files: List[str], index: int) -> FileNode:
     for imp in imports:
         # インポート文を絶対パスに変換
         normalized_import = imp.replace('.', '/').replace('_', '.')
-        for target in all_files:
+        for target_file_path in all_file_path_list:
+            target = target_file_path.full
             if normalized_import == target.replace('/', '.').replace('.py', ''):
                 # 絶対パスを追加
-                children.append(str(Path(file_path).parent / target))
+                children.append(str(Path(full_path).parent / target))
 
     file_node = FileNode(
         id=str(index) + "_" + path.name,  # IDとしてファイルのパスを使用
-        name=str(path.absolute()),
+        name=full_path,
         type='file',
         children=children,
     )
@@ -72,20 +74,19 @@ def get_file_info(file_path: str, all_files: List[str], index: int) -> FileNode:
     return file_node
 
 
-def get_python_files(directory: str) -> List[str]:
+def get_python_file_path_list(base_dir: str) -> List[FilePath]:
     python_files = []
-    for root, dirs, files in os.walk(directory):
+    for root, dirs, files in os.walk(base_dir):
         for file in files:
             if file.endswith('.py'):
                 full_path = os.path.join(root, file)
-                relative_path = os.path.relpath(full_path, directory)
-                python_files.append(relative_path)
+                relative_path = os.path.relpath(full_path, base_dir)
+                python_files.append(FilePath(full=full_path, base=base_dir, relative=relative_path))
     return python_files
 
 
-def get_file_content(file_path: str) -> str:
+def get_file_content(full_path: str) -> str:
     try:
-        full_path = os.path.join(settings.BACKEND_DIR, file_path)
         if not os.path.abspath(full_path).startswith(os.path.abspath(settings.BACKEND_DIR)):
             raise PermissionError("Access denied")
 
