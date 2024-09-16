@@ -9,9 +9,9 @@ services:
     ports:
       - "9000:9000"
     volumes:
-      - ./work:/app/work
+      - ./backend/work:/app/work
     environment:
-      - BACKEND_DIR=/app/backend
+      - BACKEND_DIR=/app/work
     networks:
       - app-network
     hostname: backend
