@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: llm_code_navigator-backend
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./work:/app/work
+    environment:
+      - BACKEND_DIR=/app/backend
+    networks:
+      - app-network
+    hostname: backend
+    entrypoint: ["python", "-m", "app.main"]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: llm_code_navigator-frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    hostname: frontend
+    entrypoint: ["npm", "run", "dev"]
+
+networks:
+  app-network:
+    driver: bridge
