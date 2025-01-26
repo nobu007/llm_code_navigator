@@ -19,11 +19,7 @@ for file in endpoints_path.glob("*.py"):
         # モジュール内の 'router' オブジェクトを探す
         if hasattr(module, 'router'):
             # ルーターをインクルード
-            api_router.include_router(
-                module.router,
-                prefix=f"/{file.stem}",
-                tags=[file.stem]
-            )
+            api_router.include_router(module.router, prefix=f"/{file.stem}", tags=[file.stem])
             print(f"Included router from {module_name}")
         else:
             print(f"No router found in {module_name}")

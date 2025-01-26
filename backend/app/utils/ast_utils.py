@@ -1,6 +1,7 @@
 import ast
 from app.core.logging import logger
 
+
 def extract_imports(content):
     try:
         tree = ast.parse(content)
