@@ -12,7 +12,7 @@ def get_relationships(file_node_list: List[FileNode]) -> List[FileEdge]:
     for file_node in file_node_list:
         if file_node.children:
             for child in file_node.children:
-                relationships.append(FileEdge(source=file_node.name, target=child))
+                relationships.append(FileEdge(source=file_node.name, target=child.name))
     return relationships
 
 
@@ -68,7 +68,12 @@ def get_file_info(file_path: FilePath, all_file_path_list: List[FilePath], index
             target = target_file_path.full
             if normalized_import == target.replace('/', '.').replace('.py', ''):
                 # 絶対パスを追加
-                children.append(str(Path(full_path).parent / target))
+                child_node = FileNode(
+                    id=str(index) + "_" + Path(target).name,
+                    name=str(Path(full_path).parent / target),
+                    type='file'
+                )
+                children.append(child_node)
 
     file_node = FileNode(
         id=str(index) + "_" + path.name,  # IDとしてファイルのパスを使用
