@@ -30,6 +30,34 @@ jobs:
         run: |
           python -m unittest discover -s backend/tests
 
+      - name: Run Docker Compose CI service
+        run: |
+          docker-compose -f docker-compose.yml run --rm ci
+
       - name: Build Docker image
         run: |
           docker build -t llm_code_navigator-backend ./backend
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm test
+
+      - name: Build frontend Docker image
+        run: |
+          docker build -t llm_code_navigator-frontend ./frontend
+
+      - name: Run frontend linting
+        run: |
+          cd frontend
+          npm run lint
