@@ -51,5 +51,23 @@ class TestFileService(unittest.TestCase):
         self.assertIsInstance(file_info[0].children, list)
         self.assertIsInstance(file_info[0].children[0], FileNode)
 
+    @patch('app.services.file_service.get_file_content')
+    def test_get_file_content_file_not_found(self, mock_get_file_content):
+        mock_get_file_content.side_effect = FileNotFoundError("Test file not found")
+        with self.assertRaises(FileNotFoundError):
+            get_file_content("non_existent_file.py")
+
+    @patch('app.services.file_service.get_file_content')
+    def test_get_file_content_permission_error(self, mock_get_file_content):
+        mock_get_file_content.side_effect = PermissionError("Test permission error")
+        with self.assertRaises(PermissionError):
+            get_file_content("restricted_file.py")
+
+    @patch('app.services.file_service.get_file_content')
+    def test_get_file_content_general_exception(self, mock_get_file_content):
+        mock_get_file_content.side_effect = Exception("Test general exception")
+        with self.assertRaises(Exception):
+            get_file_content("some_file.py")
+
 if __name__ == '__main__':
     unittest.main()

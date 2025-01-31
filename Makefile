@@ -1,5 +1,4 @@
-
-.PHONY = deps up down destroy all help
+.PHONY = deps up down destroy all help ci
 
 # デフォルトターゲットを最初に定義
 .DEFAULT_GOAL := help
@@ -36,6 +35,9 @@ destroy: deps
 # すべてのターゲットを実行
 all: deps destroy up
 
+ci: deps
+	docker-compose run --rm ci
+
 ######################
 # HELP
 ######################
@@ -47,3 +49,4 @@ help:
 	@echo 'down				- stop llm_code_navigator'
 	@echo 'destroy          - remove docker images'
 	@echo 'all              - start after destroy'
+	@echo 'ci               - run CI pipeline locally using Docker'
