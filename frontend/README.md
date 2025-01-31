@@ -14,3 +14,20 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Detailed Usage Instructions
+
+### Running the Frontend
+
+To run the frontend, use the following command:
+
+```bash
+cd llm_code_navigator/frontend
+npm install
+npm run dev
+```
+
+### Configuration Options
+
+The frontend can be configured using environment variables. The following options are available:
+
+- `NEXT_PUBLIC_API_URL`: The URL of the backend API.
