@@ -21,6 +21,12 @@ def get_file_data() -> FileData:
         files_info = get_files_info()
         relationships = get_relationships(files_info)
         return FileData(files=files_info, relationships=relationships)
+    except FileNotFoundError as e:
+        logger.error(f"File not found in get_file_data: {str(e)}")
+        raise
+    except PermissionError as e:
+        logger.error(f"Permission error in get_file_data: {str(e)}")
+        raise
     except Exception as e:
         logger.error(f"Error in get_file_data: {str(e)}")
         raise
@@ -34,7 +40,7 @@ def get_files_info() -> List[FileNode]:
         for i, file_path in enumerate(file_path_list):
             file_node = get_file_info(file_path, file_path_list, i)
             file_node_list.append(file_node)
-        print("file_node_list=", file_node_list)
+        logger.info(f"File node list: {file_node_list}")
         return file_node_list
     except Exception as e:
         logger.error(f"Error getting files: {str(e)}")
@@ -94,13 +100,13 @@ def get_file_content(full_path: str) -> str:
             content = f.read()
         return content
     except FileNotFoundError:
-        logger.error(f"File not found: {file_path}")
+        logger.error(f"File not found: {full_path}")
         raise
     except PermissionError as e:
         logger.error(f"Permission error: {str(e)}")
         raise
     except Exception as e:
-        logger.error(f"Error reading file {file_path}: {str(e)}")
+        logger.error(f"Error reading file {full_path}: {str(e)}")
         raise
 
 
