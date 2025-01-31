@@ -4,5 +4,6 @@ WORKDIR /app/frontend
 
 COPY . .
 RUN ./install.sh
+RUN npm install jest
 
 CMD ["npm", "run", "dev"]
