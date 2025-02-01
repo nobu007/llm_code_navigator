@@ -16,6 +16,7 @@ services:
       - app-network
     hostname: backend
     entrypoint: ["python", "-m", "app.main"]
+    command: ["python", "-m", "unittest", "discover", "-s", "backend/tests"]
 
   frontend:
     build:
@@ -28,19 +29,6 @@ services:
       - app-network
     hostname: frontend
     entrypoint: ["npm", "run", "dev"]
-
-  ci:
-    image: llm_code_navigator-backend
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    volumes:
-      - ./work:/app/work
-    environment:
-      - BACKEND_DIR=/app/work
-    networks:
-      - app-network
-    entrypoint: ["python", "-m", "unittest", "discover", "-s", "backend/tests"]
 
 networks:
   app-network:
