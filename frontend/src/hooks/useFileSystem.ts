@@ -1,4 +1,4 @@
-import { fetchFileContent, fetchFileData } from '@/lib/api'
+import { fetchFileContent, fetchFileData, fetchPmdResult } from '@/lib/api'
 import { FileData } from '@/types/types'
 import { useEffect, useState } from 'react'
 
@@ -34,5 +34,14 @@ export function useFileSystem() {
     }
   }
 
-  return { fileSystem, loading, error, getFileContent }
+  const getPmdResult = async (fileName: string): Promise<string> => {
+    try {
+      const result = await fetchPmdResult(fileName)
+      return JSON.stringify(result, null, 2)
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('An unknown error occurred')
+    }
+  }
+
+  return { fileSystem, loading, error, getFileContent, getPmdResult }
 }

@@ -19,14 +19,21 @@ const DynamicFileContent = dynamic(() => import('@/components/FileGraph/DynamicF
   loading: () => <p>Loading file content...</p>
 })
 
+const DynamicPmdResult = dynamic(() => import('@/components/FileGraph/DynamicPmdResult'), {
+  ssr: false,
+  loading: () => <p>Loading PMD result...</p>
+})
+
 interface LayoutProps {
   fileSystem: FileData
   getFileContent: (path: string) => Promise<string>
+  getPmdResult: (path: string) => Promise<string>
 }
 
-const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
+const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent, getPmdResult }) => {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null)
   const [fileContent, setFileContent] = useState<string | null>(null)
+  const [pmdResult, setPmdResult] = useState<string | null>(null)
   const { colorMode, toggleColorMode } = useColorMode()
   const bgColor = useColorModeValue("gray.50", "gray.900")
   const color = useColorModeValue("gray.900", "gray.50")
@@ -38,9 +45,12 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
     try {
       const content = await getFileContent(file.name)
       setFileContent(content)
+      const analysis = await getPmdResult(file.name)
+      setPmdResult(analysis)
     } catch (error) {
       console.error('Error fetching file content:', error)
       setFileContent('Error loading file content')
+      setPmdResult(null)
     }
   }
 
@@ -81,6 +91,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
               <TabList mb="1em">
                 <Tab>File Content</Tab>
                 <Tab>File Graph</Tab>
+                <Tab>PMD Analysis</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -88,6 +99,9 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent }) => {
                 </TabPanel>
                 <TabPanel>
                   <DynamicFileGraph fileData={fileSystem} onNodeSelect={handleFileSelect} />
+                </TabPanel>
+                <TabPanel>
+                  <DynamicPmdResult result={pmdResult} />
                 </TabPanel>
               </TabPanels>
             </Tabs>
