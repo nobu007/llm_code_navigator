@@ -4,7 +4,7 @@ import { useFileSystem } from "@/hooks/useFileSystem";
 import React from "react";
 
 const Home: React.FC = () => {
-	const { fileSystem, loading, error, getFileContent } = useFileSystem();
+        const { fileSystem, loading, error, getFileContent, getPmdResult } = useFileSystem();
 
 	console.log("Home component state:", { loading, error, fileSystem }); // デバッグログ
 
@@ -22,7 +22,7 @@ const Home: React.FC = () => {
 
 	console.log("FileSystem data:", JSON.stringify(fileSystem, null, 2)); // 詳細なデバッグログ
 
-	return <Layout fileSystem={fileSystem} getFileContent={getFileContent} />;
+        return <Layout fileSystem={fileSystem} getFileContent={getFileContent} getPmdResult={getPmdResult} />;
 };
 
 export default Home;

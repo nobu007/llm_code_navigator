@@ -18,3 +18,12 @@ export const fetchFileContent = async (fileName: string): Promise<string> => {
   const data = await response.json()
   return data.content
 }
+
+export const fetchPmdResult = async (fileName: string): Promise<any> => {
+  const response = await fetch(`${API_URL}/api/pmd/analysis/${fileName}`)
+  if (!response.ok) {
+    throw new Error('Failed to fetch PMD result')
+  }
+  const data = await response.json()
+  return data.result
+}
