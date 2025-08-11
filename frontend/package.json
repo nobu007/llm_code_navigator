@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest" // P3cd9
+    "test": "jest"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
