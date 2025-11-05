@@ -17,5 +17,23 @@ export interface FileData {
   relationships: FileEdge[]
 }
 
+export interface PmdViolation {
+  rule: string
+  priority: number
+  message: string
+  line: number
+  column: number
+}
+
+export interface PmdResult {
+  violations: PmdViolation[]
+  summary: {
+    totalViolations: number
+    fileAnalyzed: string
+    pmdVersion?: string
+    timestamp?: string
+  }
+}
+
 // Relationship型をエクスポートする
 export type Relationship = FileEdge;
