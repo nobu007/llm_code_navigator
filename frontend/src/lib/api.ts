@@ -1,4 +1,4 @@
-import { FileData } from '@/types/types'
+import { FileData, PmdResult } from '@/types/types'
 
 const API_URL = 'http://localhost:9000'
 
@@ -19,11 +19,11 @@ export const fetchFileContent = async (fileName: string): Promise<string> => {
   return data.content
 }
 
-export const fetchPmdResult = async (fileName: string): Promise<any> => {
+export const fetchPmdResult = async (fileName: string): Promise<PmdResult> => {
   const response = await fetch(`${API_URL}/api/pmd/analysis/${fileName}`)
   if (!response.ok) {
     throw new Error('Failed to fetch PMD result')
   }
   const data = await response.json()
-  return data.result
+  return data
 }
