@@ -1,4 +1,4 @@
-import { FileData, FileNode } from '@/types/types'
+import { FileData, FileNode, PmdResult } from '@/types/types'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { Box, HStack, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, useColorMode, useColorModeValue } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
@@ -27,13 +27,13 @@ const DynamicPmdResult = dynamic(() => import('@/components/FileGraph/DynamicPmd
 interface LayoutProps {
   fileSystem: FileData
   getFileContent: (path: string) => Promise<string>
-  getPmdResult: (path: string) => Promise<string>
+  getPmdResult: (path: string) => Promise<PmdResult>
 }
 
 const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent, getPmdResult }) => {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null)
   const [fileContent, setFileContent] = useState<string | null>(null)
-  const [pmdResult, setPmdResult] = useState<string | null>(null)
+  const [pmdResult, setPmdResult] = useState<PmdResult | null>(null)
   const { colorMode, toggleColorMode } = useColorMode()
   const bgColor = useColorModeValue("gray.50", "gray.900")
   const color = useColorModeValue("gray.900", "gray.50")
@@ -101,7 +101,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent, getPmdResul
                   <DynamicFileGraph fileData={fileSystem} onNodeSelect={handleFileSelect} />
                 </TabPanel>
                 <TabPanel>
-                  <DynamicPmdResult result={pmdResult} />
+                  <DynamicPmdResult result={pmdResult ? JSON.stringify(pmdResult) : null} />
                 </TabPanel>
               </TabPanels>
             </Tabs>

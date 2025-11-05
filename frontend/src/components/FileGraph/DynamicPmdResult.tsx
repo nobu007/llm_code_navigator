@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'
 import React from 'react'
+import { PmdResult as PmdResultType } from '@/types/types'
 
 const PmdResult = dynamic(() => import('./PmdResult'), {
   ssr: false,
@@ -11,7 +12,17 @@ interface DynamicPmdResultProps {
 }
 
 const DynamicPmdResult: React.FC<DynamicPmdResultProps> = ({ result }) => {
-  return <PmdResult result={result} />
+  let parsedResult: PmdResultType | null = null
+  
+  if (result) {
+    try {
+      parsedResult = JSON.parse(result) as PmdResultType
+    } catch (error) {
+      console.error('Failed to parse PMD result:', error)
+    }
+  }
+  
+  return <PmdResult result={parsedResult} />
 }
 
 export default DynamicPmdResult
