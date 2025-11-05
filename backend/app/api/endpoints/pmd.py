@@ -15,6 +15,6 @@ async def api_pmd_analysis(full_path: str):
 
     try:
         result = run_pmd_analysis(full_path)
-        return PmdResult(result=result)
+        return result
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
