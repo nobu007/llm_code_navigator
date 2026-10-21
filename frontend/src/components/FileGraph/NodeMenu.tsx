@@ -1,7 +1,8 @@
-import { FileNode } from '@/types/types'
 import { ChevronDownIcon } from "@chakra-ui/icons"
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
 import React from 'react'
+
+import { FileNode } from '@/types/types'
 
 interface NodeMenuProps {
   selectedNode: FileNode | null

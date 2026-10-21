@@ -1,6 +1,7 @@
-import { FileEdge, FileNode } from '@/types/types'
 import dynamic from 'next/dynamic'
 import React from 'react'
+
+import { FileEdge, FileNode } from '@/types/types'
 
 const SigmaContainer = dynamic(() => import('@react-sigma/core').then(mod => mod.SigmaContainer), { ssr: false })
 const ControlsContainer = dynamic(() => import('@react-sigma/core').then(mod => mod.ControlsContainer), { ssr: false })
