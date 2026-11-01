@@ -16,7 +16,6 @@ services:
       - app-network
     hostname: backend
     entrypoint: ["python", "-m", "app.main"]
-    command: ["python", "-m", "unittest", "discover", "-s", "backend/tests"]
 
   frontend:
     build:

@@ -1,5 +1,6 @@
-import { FileNode } from '@/types/types'
 import React from 'react'
+
+import { FileNode } from '@/types/types'
 
 interface FileListProps {
   files: FileNode[]

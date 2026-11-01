@@ -1,8 +1,9 @@
-import { FileEdge, FileNode } from "@/types/types";
 import { useCamera, useLoadGraph, useSigma } from "@react-sigma/core";
 import Graph from "graphology";
 import { circular } from "graphology-layout";
 import React, { useEffect, useRef } from "react";
+
+import { FileEdge, FileNode } from "@/types/types";
 
 interface LoadGraphProps {
   files: FileNode[];
