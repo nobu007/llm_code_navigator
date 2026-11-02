@@ -47,7 +47,7 @@ The CI/CD pipeline is defined in the `.github/workflows/ci.yml` file. It include
 - Set up Python
 - Install dependencies
 - Run tests
-- Run Docker Compose CI service
+- Run backend tests using Docker Compose
 - Build Docker image for backend
 - Set up Node.js
 - Install frontend dependencies
@@ -65,7 +65,12 @@ The `docker-compose.yml` file defines the services for the backend and frontend.
 
 - `backend`: The backend service, which runs the Python backend.
 - `frontend`: The frontend service, which runs the development server for the frontend.
-- `ci`: The CI service, which runs the tests for the backend.
+
+The backend tests run in the same image as the backend service, with the entrypoint overridden:
+
+```bash
+docker compose run --rm --entrypoint python backend -m unittest discover -s tests
+```
 
 ### Backend Dockerfile
 

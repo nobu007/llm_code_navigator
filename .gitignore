@@ -4,3 +4,9 @@
 # auto-added by instructions/10_storage/100_audit_storage_policy.md
 .audit/development_direction.yml
 
+# local backend virtualenv used to run the backend suite
+.venv/
+
+# the backend logger creates logs/app.log relative to the working directory
+logs/
+

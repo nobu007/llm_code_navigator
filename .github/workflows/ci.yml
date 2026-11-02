@@ -14,12 +14,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          # Quoted so YAML keeps it a string; unquoted 3.10 is parsed as the
+          # float 3.1 and setup-python then fails with "Version 3.1 not found".
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
@@ -28,25 +30,26 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m unittest discover -s backend/tests
+          cd backend
+          python -m unittest discover -s tests
 
       - name: Run backend tests using Docker Compose
         run: |
-          docker-compose -f docker-compose.yml run --rm backend
+          docker compose run --rm --entrypoint python backend -m unittest discover -s tests
 
       - name: Build Docker image
         run: |
           docker build -t llm_code_navigator-backend ./backend
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '22'
 
       - name: Install frontend dependencies
         run: |
           cd frontend
-          npm install
+          npm ci
 
       - name: Run frontend tests
         run: |

@@ -1,6 +1,7 @@
-import { FileNode } from '@/types/types'
 import dynamic from 'next/dynamic'
 import React from 'react'
+
+import { FileNode } from '@/types/types'
 
 const FileList = dynamic(() => import('./FileList'), {
   ssr: false,

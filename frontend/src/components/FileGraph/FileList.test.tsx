@@ -1,8 +1,10 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import FileList from './FileList';
+import React from 'react';
+
+import '@testing-library/jest-dom';
 import { FileNode } from '@/types/types';
+
+import FileList from './FileList';
 
 const mockFiles: FileNode[] = [
   {

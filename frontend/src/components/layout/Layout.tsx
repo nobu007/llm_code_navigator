@@ -1,8 +1,9 @@
-import { FileData, FileNode, PmdResult } from '@/types/types'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { Box, HStack, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, useColorMode, useColorModeValue } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
 import React, { useEffect, useState } from 'react'
+
+import { FileData, FileNode, PmdResult } from '@/types/types'
 
 const DynamicFileList = dynamic(() => import('@/components/FileGraph/DynamicFileList'), {
   ssr: false,
