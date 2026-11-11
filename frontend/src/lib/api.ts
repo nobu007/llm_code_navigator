@@ -7,7 +7,7 @@ export const fetchFileData = async (): Promise<FileData> => {
   if (!response.ok) {
     throw new Error('Failed to fetch file data')
   }
-  return response.json()
+  return (await response.json()) as FileData
 }
 
 export const fetchFileContent = async (fileName: string): Promise<string> => {
@@ -15,7 +15,7 @@ export const fetchFileContent = async (fileName: string): Promise<string> => {
   if (!response.ok) {
     throw new Error('Failed to fetch file content')
   }
-  const data = await response.json()
+  const data = (await response.json()) as { content: string }
   return data.content
 }
 
@@ -24,6 +24,5 @@ export const fetchPmdResult = async (fileName: string): Promise<PmdResult> => {
   if (!response.ok) {
     throw new Error('Failed to fetch PMD result')
   }
-  const data = await response.json()
-  return data
+  return (await response.json()) as PmdResult
 }

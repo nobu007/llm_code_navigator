@@ -1,8 +1,9 @@
-import { FileData, FileNode, PmdResult } from '@/types/types'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { Box, HStack, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack, useColorMode, useColorModeValue } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
 import React, { useEffect, useState } from 'react'
+
+import { FileData, FileNode, PmdResult } from '@/types/types'
 
 const DynamicFileList = dynamic(() => import('@/components/FileGraph/DynamicFileList'), {
   ssr: false,
@@ -84,7 +85,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent, getPmdResul
         </HStack>
         <HStack align="stretch" spacing={4} height="calc(100vh - 100px)">
           <Box width="300px" overflowY="auto" borderWidth={1} borderRadius="md" p={2}>
-            <DynamicFileList files={fileSystem.files} onFileSelect={handleFileSelect} />
+            <DynamicFileList files={fileSystem.files} onFileSelect={(file) => { void handleFileSelect(file) }} />
           </Box>
           <Box flex={1}>
             <Tabs isFitted variant="enclosed" index={activeTab} onChange={(index) => setActiveTab(index)}>
@@ -98,7 +99,7 @@ const Layout: React.FC<LayoutProps> = ({ fileSystem, getFileContent, getPmdResul
                   <DynamicFileContent fileName={selectedFile?.name || null} content={fileContent} />
                 </TabPanel>
                 <TabPanel>
-                  <DynamicFileGraph fileData={fileSystem} onNodeSelect={handleFileSelect} />
+                  <DynamicFileGraph fileData={fileSystem} onNodeSelect={(file) => { void handleFileSelect(file) }} />
                 </TabPanel>
                 <TabPanel>
                   <DynamicPmdResult result={pmdResult ? JSON.stringify(pmdResult) : null} />

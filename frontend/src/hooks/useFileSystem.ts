@@ -1,6 +1,8 @@
-import { fetchFileContent, fetchFileData, fetchPmdResult } from '@/lib/api'
-import { FileData, PmdResult } from '@/types/types'
 import { useEffect, useState } from 'react'
+
+import { FileData, PmdResult } from '@/types/types'
+
+import { fetchFileContent, fetchFileData, fetchPmdResult } from '@/lib/api'
 
 export function useFileSystem() {
   const [fileSystem, setFileSystem] = useState<FileData | null>(null)
@@ -8,7 +10,7 @@ export function useFileSystem() {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    fetchFileSystemData()
+    void fetchFileSystemData()
   }, [])
 
   const fetchFileSystemData = async () => {

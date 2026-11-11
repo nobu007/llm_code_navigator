@@ -1,8 +1,9 @@
-import { FileEdge, FileNode } from "@/types/types";
 import { useCamera, useLoadGraph, useSigma } from "@react-sigma/core";
 import Graph from "graphology";
 import { circular } from "graphology-layout";
 import React, { useEffect, useRef } from "react";
+
+import { FileEdge, FileNode } from "@/types/types";
 
 interface LoadGraphProps {
   files: FileNode[];
@@ -43,14 +44,15 @@ const LoadGraph: React.FC<LoadGraphProps> = ({ files, relationships, onNodeClick
     loadGraph(graph);
 
     if (graph.order > 0) {
-      const { x, y } = graph.getNodeAttributes(graph.nodes()[0]);
+      const firstAttributes = graph.getNodeAttributes(graph.nodes()[0]) as { x: number; y: number };
+      const { x, y } = firstAttributes;
       camera.goto({ x, y, ratio: 1 }, { duration: 500 });
     }
 
     sigma.on("clickNode", (event) => {
       const nodeId = event.node;
-      const nodeAttributes = graph.getNodeAttributes(nodeId);
-      onNodeClick(nodeAttributes.file, event.event.original as MouseEvent);
+      const nodeAttributes = graph.getNodeAttributes(nodeId) as { file: FileNode };
+      onNodeClick(nodeAttributes.file, event.event.original);
     });
 
     console.log("Graph loaded:", graph.order, "nodes,", graph.size, "edges");

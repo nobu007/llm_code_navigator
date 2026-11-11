@@ -1,5 +1,7 @@
-import { FileEdge, FileNode } from '@/types/types'
 import React from 'react'
+
+import { FileEdge, FileNode } from '@/types/types'
+
 import DynamicSigmaContainer from './DynamicSigmaContainer'
 import LoadGraph from './LoadGraph'
 
