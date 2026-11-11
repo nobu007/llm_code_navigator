@@ -14,12 +14,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          # Must stay quoted: unquoted 3.10 is YAML-parsed as the float 3.1
+          # and setup-python fails with "Version 3.1 not found".
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -27,37 +29,32 @@ jobs:
           pip install -r backend/requirements.txt
 
       - name: Run tests
-        run: |
-          python -m unittest discover -s backend/tests
-
-      - name: Run backend tests using Docker Compose
-        run: |
-          docker-compose -f docker-compose.yml run --rm backend
+        # Tests import `app.*`, so they must run with backend/ as the root.
+        working-directory: backend
+        run: python -m unittest discover -s tests
 
       - name: Build Docker image
         run: |
           docker build -t llm_code_navigator-backend ./backend
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          # Next.js 14 requires Node >= 18.17.
+          node-version: "20"
 
       - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm install
+        working-directory: frontend
+        run: npm ci
 
       - name: Run frontend tests
-        run: |
-          cd frontend
-          npm test
+        working-directory: frontend
+        run: npm test
 
       - name: Build frontend Docker image
         run: |
           docker build -t llm_code_navigator-frontend ./frontend
 
       - name: Run frontend linting
-        run: |
-          cd frontend
-          npm run lint
+        working-directory: frontend
+        run: npm run lint
