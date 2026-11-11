@@ -4,3 +4,6 @@
 # auto-added by instructions/10_storage/100_audit_storage_policy.md
 .audit/development_direction.yml
 
+
+# backend test runs write logs here
+backend/logs/
