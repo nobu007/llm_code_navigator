@@ -205,7 +205,7 @@ def _validate_file_path(file_path: str) -> str:
         raise PermissionError(f"Access denied: Path outside allowed directory. Path: {resolved_path}, Allowed: {backend_dir}")
     
     # Check for suspicious path patterns
-    suspicious_patterns = ['..', '~', '/etc/', '/root/', '/home/', 'C:\\', 'windows\\system32']$']
+    suspicious_patterns = ['..', '~', '/etc/', '/root/', '/home/', 'C:\\', 'windows\\system32']
     for pattern in suspicious_patterns:
         if pattern in file_path:
             raise PermissionError(f"Suspicious path pattern detected: {pattern}")
