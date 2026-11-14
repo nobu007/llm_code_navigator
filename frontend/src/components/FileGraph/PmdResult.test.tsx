@@ -1,8 +1,10 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
+
 import '@testing-library/jest-dom/extend-expect';
-import PmdResult from './PmdResult';
 import { PmdResult as PmdResultType } from '@/types/types';
+
+import PmdResult from './PmdResult';
 
 describe('PmdResult', () => {
   it('renders PMD result with violations', () => {
