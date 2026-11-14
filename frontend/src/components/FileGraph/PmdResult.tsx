@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { PmdResult as PmdResultType } from '@/types/types'
 
 interface PmdResultProps {

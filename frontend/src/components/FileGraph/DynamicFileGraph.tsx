@@ -1,8 +1,10 @@
-import { FileData, FileNode } from '@/types/types';
 import { Box, Portal, Text, useColorModeValue } from '@chakra-ui/react';
 import { ControlsContainer, FullScreenControl, SigmaContainer, ZoomControl } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import React, { useEffect, useRef, useState } from 'react';
+
+import { FileData, FileNode } from '@/types/types';
+
 import LoadGraph from './LoadGraph';
 import NodeMenu from './NodeMenu';
 

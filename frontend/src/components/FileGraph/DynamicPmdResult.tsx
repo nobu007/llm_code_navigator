@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'
 import React from 'react'
+
 import { PmdResult as PmdResultType } from '@/types/types'
 
 const PmdResult = dynamic(() => import('./PmdResult'), {
